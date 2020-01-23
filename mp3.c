@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Test                              Author: Taha Emara
+//                               Author: Taha Emara
 //
 //   Website          :  http://www.emaraic.com
 //   Facebook Page    :  https://www.facebook.com/emaraic.page
@@ -133,16 +133,43 @@ void* playMp3()
  while(1){usleep(10000);
   if((play_flag==1) && usbPath()!=NULL){
    scanMp3();
-   play_flag=0;
+  //play_flag=0;
    printf("total tracks : %d\n" ,vector_total(&v));
    int l = strlen((char *) vector_get(&v, list_iterator-1)) + strlen("mpg321 ") + 1;
+   pid_t ret;
    newr = malloc(l);
-   strcpy(newr,"mpg321 ");
-   strcat(newr,(char *) vector_get(&v ,list_iterator-1 ) );
+//   strcpy(newr,"mpg321 ");
+//   strcat(newr,(char *) vector_get(&v ,list_iterator-1 ) );
+
   //int track=vector_total(&v)-list_iterator;
   //strcat(newr,"/media/MYLINUXLIVE/049.mp3");
-   printf("li %d value t-li %s\n",list_iterator, (char*)vector_get(&v , list_iterator-1 ));
-   system(newr);
+   strcpy(newr,(char *) vector_get(&v ,list_iterator-1 ) );
+
+//   printf("li %d value t-li %s\n",list_iterator, (char*)vector_get(&v , list_iterator-1 ));
+//   printf("pid %d\n",getpid());
+//   system(newr);
+   play_flag=0;
+   int status;
+   ret=fork();
+   if (ret == 0 ){
+//      sleep(2000);
+//     printf("%s",newr);
+     execlp("mpg123", "mpg123",  "/media/usb0/Die30BestenHerbstliederf?rKinder/01-DerHerbstHatBunteBlaetter.mp3", NULL);
+//      execlp("ls","ls", NULL);
+   }else{
+     printf("NewPid: %d\n",ret);
+     ret=waitpid(ret, &status, NULL);
+     printf("Wait finished with PID %d\n",ret);
+     if (ret>0) {
+       if (list_iterator<vector_total(&v)){
+          list_iterator++;
+    //      play_flag=1;
+        }else {
+          play_flag=0;
+       }//end if
+     }
+   }
+
   //printf("end play");
   }else{
    // flag=0;

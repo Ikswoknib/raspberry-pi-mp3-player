@@ -1,4 +1,4 @@
-//////////////////////////////////Test/////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
 
 #include"usbcheck.h"
 
@@ -23,22 +23,27 @@ while(count< numUsbDevs){
 
   devPtr=devList[count];
   retval=libusb_open(devPtr,&devHandle);
-  if(retval!=LIBUSB_SUCCESS)
-   break;
-  retval=libusb_get_device_descriptor(devPtr,&devDesc);
-  if(retval!=LIBUSB_SUCCESS)
-   break;
-  if(devDesc.iProduct>0){
-    retval=libusb_get_string_descriptor_ascii(devHandle,devDesc.iProduct,strDesc,256);
-    if(retval<0)
-      break;
-    if (strstr(strDesc,devnam)!=NULL)
-    ret=1;
+//printf("1%d\n",count);
+  if(retval=LIBUSB_SUCCESS) {
+//    printf("2\n");
+    retval=libusb_get_device_descriptor(devPtr,&devDesc);
+    if(retval=LIBUSB_SUCCESS){
+//      printf("3\n");
+      if(devDesc.iProduct>0){
+//        printf("4\n");
+        retval=libusb_get_string_descriptor_ascii(devHandle,devDesc.iProduct,strDesc,256);
+        if(retval>=0) {
+//          printf("5\n");
+          if (strstr(strDesc,devnam)!=NULL)
+            ret=1;
+        }
+      }
+    }
     //printf("exists\n");
   }//end if
-libusb_close(devHandle);
-devHandle=NULL;
-count++;
+  libusb_close(devHandle);
+  devHandle=NULL;
+  count++;
 }//end while
 libusb_exit(NULL);
 return ret;
